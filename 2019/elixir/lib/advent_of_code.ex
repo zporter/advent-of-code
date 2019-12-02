@@ -3,7 +3,7 @@ defmodule AdventOfCode do
   Documentation for AdventOfCode 2019.
   """
 
-  alias AdventOfCode.FuelCounter
+  alias AdventOfCode.{FuelCounter, Intcode}
 
   @doc """
   The Elves quickly load you into a spacecraft and prepare to launch.
@@ -21,6 +21,19 @@ defmodule AdventOfCode do
     |> Stream.map(&String.to_integer/1)
     |> Stream.map(&FuelCounter.call/1)
     |> Enum.sum()
+  end
+
+  @doc "Entry point for Day 2's solution"
+  def calc_intcode do
+    "day_2.txt"
+    |> puzzle_input_stream()
+    |> Stream.flat_map(&String.split(&1, ","))
+    |> Stream.map(&String.to_integer/1)
+    |> Enum.to_list()
+    |> List.replace_at(1, 12)
+    |> List.replace_at(2, 2)
+    |> Intcode.call()
+    |> Enum.at(0)
   end
 
   @doc "Builds a File Stream for a given puzzle input filename."
