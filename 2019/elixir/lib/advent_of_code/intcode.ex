@@ -44,6 +44,33 @@ defmodule AdventOfCode.Intcode do
     process(instructions, 0)
   end
 
+  @spec find_noun_and_verb(instructions, pos_integer) :: {pos_integer, pos_integer} | no_return
+  def find_noun_and_verb(instructions, result, noun \\ 0, verb \\ 0)
+
+  def find_noun_and_verb(_instructions, result, 100, _) do
+    raise "Could not find a noun or verb for #{result}"
+  end
+
+  def find_noun_and_verb(instructions, result, noun, 100) do
+    find_noun_and_verb(instructions, result, noun + 1, 0)
+  end
+
+  def find_noun_and_verb(instructions, result, noun, verb)
+      when is_list(instructions) and is_integer(result) and result > 0 do
+    instructions
+    |> List.replace_at(1, noun)
+    |> List.replace_at(2, verb)
+    |> call()
+    |> Enum.at(0)
+    |> case do
+      ^result ->
+        {noun, verb}
+
+      _ ->
+        find_noun_and_verb(instructions, result, noun, verb + 1)
+    end
+  end
+
   defp process(instructions, current_pos) do
     instructions
     |> Enum.slice(current_pos, 4)

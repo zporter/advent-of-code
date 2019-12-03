@@ -36,6 +36,16 @@ defmodule AdventOfCode do
     |> Enum.at(0)
   end
 
+  @spec find_intcode_noun_and_verb(pos_integer) :: {pos_integer, pos_integer}
+  def find_intcode_noun_and_verb(result) do
+    "day_2.txt"
+    |> puzzle_input_stream()
+    |> Stream.flat_map(&String.split(&1, ","))
+    |> Stream.map(&String.to_integer/1)
+    |> Enum.to_list()
+    |> Intcode.find_noun_and_verb(result)
+  end
+
   @doc "Builds a File Stream for a given puzzle input filename."
   @spec puzzle_input_stream(String.t()) :: Stream.t()
   def puzzle_input_stream(path) do
