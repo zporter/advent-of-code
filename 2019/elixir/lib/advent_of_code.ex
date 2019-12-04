@@ -3,7 +3,7 @@ defmodule AdventOfCode do
   Documentation for AdventOfCode 2019.
   """
 
-  alias AdventOfCode.{FuelCounter, Intcode}
+  alias AdventOfCode.{FuelCounter, Intcode, CrossedWires}
 
   @doc """
   The Elves quickly load you into a spacecraft and prepare to launch.
@@ -44,6 +44,17 @@ defmodule AdventOfCode do
     |> Stream.map(&String.to_integer/1)
     |> Enum.to_list()
     |> Intcode.find_noun_and_verb(result)
+  end
+
+  @doc "Solution for Day 3, Part 1"
+  def manhatten_distance do
+    [wire_1, wire_2] =
+      "day_3.txt"
+      |> puzzle_input_stream()
+      |> Stream.map(&String.split(&1, ","))
+      |> Enum.to_list()
+
+    CrossedWires.manhatten_distance(wire_1, wire_2)
   end
 
   @doc "Builds a File Stream for a given puzzle input filename."
