@@ -57,6 +57,17 @@ defmodule AdventOfCode do
     CrossedWires.manhatten_distance(wire_1, wire_2)
   end
 
+  @doc "Solution for Day 3, Part 2"
+  def fewest_steps do
+    [wire_1, wire_2] =
+      "day_3.txt"
+      |> puzzle_input_stream()
+      |> Stream.map(&String.split(&1, ","))
+      |> Enum.to_list()
+
+    CrossedWires.fewest_steps(wire_1, wire_2)
+  end
+
   @doc "Builds a File Stream for a given puzzle input filename."
   @spec puzzle_input_stream(String.t()) :: Stream.t()
   def puzzle_input_stream(path) do
