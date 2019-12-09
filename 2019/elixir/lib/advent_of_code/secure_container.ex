@@ -16,9 +16,12 @@ defmodule AdventOfCode.SecureContainer do
 
   Other than the range rule, the following are true:
 
-    - 111111 meets these criteria (double 11, never decreases).
+    - 111111 does not meet these criteria (the repeated 11is part of a larger group).
     - 223450 does not meet these criteria (decreasing pair of digits 50).
     - 123789 does not meet these criteria (no double).
+    - 112233 meets these criteria because the digits never decrease and all repeated digits are exactly two digits long.
+    - 123444 no longer meets the criteria (the repeated 44 is part of a larger group of 444).
+    - 111122 meets the criteria (even though 1 is repeated more than twice, it still contains a double 22).
   """
 
   @doc """
@@ -28,7 +31,7 @@ defmodule AdventOfCode.SecureContainer do
   ## Examples
    
       iex> AdventOfCode.SecureContainer.password_count("111111-111113")
-      3
+      0
       iex> AdventOfCode.SecureContainer.password_count("156788-156799")
       2
   """
@@ -52,15 +55,21 @@ defmodule AdventOfCode.SecureContainer do
       iex> AdventOfCode.SecureContainer.is_password?(111)
       false
       iex> AdventOfCode.SecureContainer.is_password?(111111)
-      true
+      false
       iex> AdventOfCode.SecureContainer.is_password?(223450)
       false
       iex> AdventOfCode.SecureContainer.is_password?(111123)
-      true
+      false
       iex> AdventOfCode.SecureContainer.is_password?(123789)
       false
       iex> AdventOfCode.SecureContainer.is_password?(135679)
       false
+      iex> AdventOfCode.SecureContainer.is_password?(112233)
+      true
+      iex> AdventOfCode.SecureContainer.is_password?(123444)
+      false
+      iex> AdventOfCode.SecureContainer.is_password?(111122)
+      true
   """
   @spec is_password?(pos_integer) :: boolean
   def is_password?(password) when is_integer(password) do
@@ -71,10 +80,15 @@ defmodule AdventOfCode.SecureContainer do
 
   defp check_digits([first_digit | rest] = digits) when length(digits) == 6 do
     rest
-    |> Enum.reduce_while({[first_digit], false}, &check_digit/2)
+    |> Enum.reduce_while({[first_digit], %{}}, &check_digit/2)
     |> case do
-      {digits, true} when is_list(digits) -> true
-      _ -> false
+      {digits, repeated_digits} when is_list(digits) and is_map(repeated_digits) ->
+        repeated_digits
+        |> Map.values()
+        |> Enum.any?()
+
+      _ ->
+        false
     end
   end
 
@@ -82,16 +96,18 @@ defmodule AdventOfCode.SecureContainer do
 
   # Used in a reduce_while. Hence the return tuple containing either :continue
   # or :halt.
-  defp check_digit(digit, {[prev_digit | _rest] = digits, _repeat_flag})
+  defp check_digit(digit, {[prev_digit | _rest] = digits, repeated_digits})
        when prev_digit == digit do
-    {:cont, {[digit | digits], true}}
+    repeated_digits = Map.update(repeated_digits, digit, true, fn _val -> false end)
+
+    {:cont, {[digit | digits], repeated_digits}}
   end
 
-  defp check_digit(digit, {[prev_digit | _rest], _repeat_flag}) when prev_digit > digit do
+  defp check_digit(digit, {[prev_digit | _rest], _repeated_digits}) when prev_digit > digit do
     {:halt, false}
   end
 
-  defp check_digit(digit, {digits, repeat_flag}) do
-    {:cont, {[digit | digits], repeat_flag}}
+  defp check_digit(digit, {digits, repeated_digits}) do
+    {:cont, {[digit | digits], repeated_digits}}
   end
 end
